@@ -1,0 +1,14 @@
+name = "PDPCRMember1"
+uuid = "9d6cae6d-5273-48d9-8fef-46e381f5c2bd"
+authors = ["PDP-CR project"]
+version = "0.1.0"
+
+[deps]
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
