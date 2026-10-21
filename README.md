@@ -63,3 +63,37 @@ save_instance(instance, "data/generated.csv")
 Robot được đánh số từ 1 đến m; task được đánh số theo vị trí trong `instance.tasks`.
 Nguồn flow dùng node 0, sink dùng node n+1. Đây là phần việc Thành viên 1;
 neighborhood và Tabu Search được tích hợp ở các module khác.
+---
+
+# PDP-CR — Thành viên 2: flow-DAG và neighborhood (Julia)
+
+Module `PDPCRMember2` cài đặt cách biểu diễn nghiệm dạng flow-DAG và ba
+neighborhood của bài báo *Redistribute neighborhood in the PDP-CR*. Module dùng
+kiểu dữ liệu của Thành viên 1; nạp cả hai qua `src/PDPCR.jl`.
+
+```powershell
+julia --project=. test/test_member2.jl        # kiểm thử (gồm ví dụ 1 và ví dụ 3 của bài báo)
+julia --project=. examples/member2_demo.jl    # minh họa
+```
+
+```julia
+include("src/PDPCR.jl")
+using .PDPCRMember1, .PDPCRMember2, Random
+
+instance = generate_instance(40, 8; seed=1)
+s  = from_solution(FlowProblem(instance), instance, greedy_initial_solution(instance; seed=1))
+ev = evaluate(s)                     # thứ tự topo, L, L̄, L*, makespan
+res = redistribute(s, choose_cut(s)) # cắt tại ζ ngẫu nhiên và phân phối lại flow
+cands = generate_neighbors(s; config=default_config(40, :TSR), rng=MersenneTwister(1))
+best = argmin(c -> c.after, cands)
+s = materialize(s, best)             # nghiệm mới
+```
+
+| File | Nội dung |
+| :--- | :--- |
+| `src/flow_graph.jl` | `FlowProblem`, `FlowSolution`; chuyển đổi với `Solution`; thứ tự topo; Algorithm 1–2 (`L`, `L*`); makespan; cung găng; kiểm tra hợp lệ |
+| `src/neighborhoods.jl` | `Move`, `Candidate`, đánh giá tại chỗ, `generate_neighbors`, cấu hình Bảng 4, thuộc tính tabu |
+| `src/redistribute.jl` | chọn `ζ`, chia `N_left`/`N_right`, flow qua lát cắt, Algorithm 3 |
+| `src/reroute.jl` | reroute (`full`, `max,ca`, `max,ca,δ`) |
+| `src/reverse.jl` | reverse (cung găng) |
+| `report/member2_neighborhoods.md` | bản nháp phần phương pháp cho báo cáo |
