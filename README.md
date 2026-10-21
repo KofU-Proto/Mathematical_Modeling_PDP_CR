@@ -32,13 +32,14 @@ Hàm `visualize_solution` xuất một file SVG gồm sơ đồ tuyến robot tr
 và biểu đồ Gantt. Màu sắc phân biệt robot; mũi tên chỉ hướng đi; vùng gạch chéo
 trong Gantt biểu diễn robot chờ các thành viên khác của đội đến task.
 
-Chạy mô phỏng mẫu và xuất hình SVG:
+Chạy mô phỏng cả 6 bộ sample và xuất hình SVG:
 
 ```powershell
 julia --project=. examples\visualize_sample.jl
 ```
 
-Hình được lưu tại `plots/sample_simulation.svg` và có thể mở bằng trình duyệt.
+Mỗi instance sinh một hình riêng tại `plots/sample_simulation_m{m}_n{n}.svg`;
+có thể mở các hình bằng trình duyệt.
 
 Đọc instance CSV có các cột `task_id,pickup_x,pickup_y,delivery_x,delivery_y,
 processing_time,required_robots`. Có thể bỏ cột `processing_time` hoặc để
@@ -48,6 +49,25 @@ File mẫu nằm tại `data/sample.csv`.
 ```julia
 instance = load_instance("data/sample.csv", 2)
 save_instance(instance, "data/generated.csv")
+```
+
+### Bộ sample theo số robot và số task
+
+Thư mục `data/` có 6 instance CSV bao phủ mọi tổ hợp `m ∈ {1, 2}` robot và
+`n ∈ {5, 10, 15}` task. Tên file theo dạng `sample_m{m}_n{n}.csv`, ví dụ
+`data/sample_m2_n10.csv`. Các file được sinh tái lập bằng seed cố định; số
+robot yêu cầu của mỗi task luôn không vượt quá số robot trong instance.
+
+Để tạo lại toàn bộ bộ dữ liệu:
+
+```powershell
+julia --project=. examples\generate_sample_data.jl
+```
+
+Ví dụ nạp bộ `m=2`, `n=10`:
+
+```julia
+instance = load_instance("data/sample_m2_n10.csv", 2)
 ```
 
 ## Thành phần đã triển khai

@@ -51,6 +51,18 @@ end
     @test length(sample.tasks) == 3
     @test is_feasible(sample, greedy_initial_solution(sample; seed=7))
 
+    data_dir = joinpath(@__DIR__, "..", "data")
+    for robot_count in (1, 2), task_count in (5, 10, 15)
+        sample_path = joinpath(data_dir, "sample_m$(robot_count)_n$(task_count).csv")
+        generated_sample = load_instance(sample_path, robot_count)
+        @test length(generated_sample.tasks) == task_count
+        @test all(task.required_robots <= robot_count for task in generated_sample.tasks)
+        @test is_feasible(
+            generated_sample,
+            greedy_initial_solution(generated_sample; seed=7),
+        )
+    end
+
     mktempdir() do directory
         path = joinpath(directory, "tasks.csv")
         save_instance(first, path)
