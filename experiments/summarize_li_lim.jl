@@ -57,6 +57,24 @@ function write_comparison(output::AbstractString)
             end
         end
     end
+    for (suffix, name) in (("", "default"), ("_changed", "changed"))
+        merge_convergence(suffix, joinpath(RESULT_ROOT, "li_lim_convergence_$(name).csv"))
+    end
+    return output
+end
+
+function merge_convergence(suffix::AbstractString, output::AbstractString)
+    open(output, "w") do target
+        for (index, (_, name)) in enumerate(CLASSES)
+            path = joinpath(RESULT_ROOT, "li_lim_lc1_$(name)$(suffix)", "convergence.csv")
+            lines = readlines(path)
+            length(lines) > 1 || throw(ArgumentError("Thiếu dữ liệu hội tụ: $path"))
+            index == 1 && println(target, first(lines))
+            for line in lines[2:end]
+                println(target, line)
+            end
+        end
+    end
     return output
 end
 
