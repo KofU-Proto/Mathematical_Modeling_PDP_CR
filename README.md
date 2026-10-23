@@ -117,3 +117,32 @@ s = materialize(s, best)             # nghiệm mới
 | `src/reroute.jl` | reroute (`full`, `max,ca`, `max,ca,δ`) |
 | `src/reverse.jl` | reverse (cung găng) |
 | `report/member2_neighborhoods.md` | bản nháp phần phương pháp cho báo cáo |
+
+---
+
+# PDP-CR — Thành viên 3: Tabu Search và thực nghiệm (Julia)
+
+`src/PDPCRMember3.jl` dùng trực tiếp `FlowSolution` và ba neighborhood của phần 2.
+`TSO` dùng reroute và reverse; `TSR` thêm redistribute. Tham số mặc định theo
+Bảng 5.2, Chương 5 luận án Nguyen (2025): 5.000 vòng, tabu size `⌊n/8⌋` và
+`⌊n/15⌋`, `β = 0,3` cho TSR, quay về nghiệm tốt nhất sau 300 vòng không cải
+thiện và tạo nghiệm đầu mới sau 600 vòng. Với `n < 15`, phần 2 vẫn sinh ít nhất
+một láng giềng mỗi loại để bộ dữ liệu nhỏ có thể chạy được.
+
+```bash
+julia --project=. test/test_member3.jl
+julia --project=. experiments/run_comparison.jl --sizes=15,30,50 --robots=5,10 --seeds=1,2 --iterations=5000 --step=100 --output=results/member3
+julia --project=. experiments/plot_results.jl results/member3/convergence.csv plots/member3
+```
+
+Lệnh thực nghiệm sinh cùng một instance và cùng nghiệm greedy ban đầu cho TSO
+và TSR ở mỗi bộ `(n,m,seed)`. `runs.csv` ghi từng lượt; `summary.csv` ghi
+makespan tốt nhất/trung bình, thời gian, số lần TSR tốt hơn và mức cải thiện
+`100 × (TSO − TSR) / TSO`; `convergence.csv` ghi makespan tốt nhất theo vòng
+theo phần trăm so với nghiệm đầu (100%). CSV được ghi dần trong quá trình chạy.
+Các SVG tương ứng nằm trong `plots/member3/`.
+
+Kết quả chạy hiện tại và diễn giải nằm tại `report/member3_tabu_search.md`.
+Thử nghiệm này dùng instance ngẫu nhiên do phần 1 sinh ra và một biến thể greedy
+để tạo nghiệm restart. Nó không dùng bộ instance Li & Lim hay S-greedy đầy đủ
+trong luận án, nên số liệu không phải phép tái lập trực tiếp Bảng 5 của bài báo.

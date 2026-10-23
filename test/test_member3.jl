@@ -14,6 +14,9 @@ using .ExperimentStatistics
     @test_throws ArgumentError default_tabu_config(10, :bad)
 
     instance = generate_instance(15, 4; seed=8)
+    fresh = diversified_greedy_solution(instance; rng=MersenneTwister(8))
+    @test validate_solution(instance, fresh)
+    @test is_feasible(instance, fresh)
     initial = from_solution(FlowProblem(instance), instance, greedy_initial_solution(instance; seed=8))
     original_arcs = arcs(initial)
     for version in (:TSO, :TSR)

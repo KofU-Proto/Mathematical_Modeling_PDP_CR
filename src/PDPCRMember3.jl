@@ -7,6 +7,6 @@ using ..PDPCRMember2
 
 include("tabu_search.jl")
 
-export TabuConfig, TabuResult, default_tabu_config, tabu_search
+export TabuConfig, TabuResult, default_tabu_config, tabu_search, diversified_greedy_solution
 
 end

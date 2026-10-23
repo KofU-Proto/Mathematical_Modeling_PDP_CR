@@ -155,7 +155,48 @@ function tabu_search(initial::FlowSolution;
                       config.max_iterations, elite_restarts, initial_restarts, counts)
 end
 
-"""Tiện ích dùng greedy của Thành viên 1 để tạo nghiệm đầu và nghiệm restart."""
+"""
+Biến thể greedy ngẫu nhiên cho restart: chọn đều trong 3 task có thời điểm
+hoàn tất sớm nhất; đội robot vẫn là đội đến sớm nhất. Đây là xấp xỉ đơn giản
+của cơ chế S-greedy (không phải Algorithm 5–6 đầy đủ trong luận án).
+"""
+function diversified_greedy_solution(instance::ProblemInstance;
+                                     rng::AbstractRNG=Random.default_rng(), rcl::Int=3)
+    rcl >= 1 || throw(ArgumentError("rcl phải dương"))
+    n, m = length(instance.tasks), instance.robot_count
+    remaining = trues(n)
+    ready = zeros(Float64, m)
+    locations = fill(instance.depot, m)
+    order = Int[]
+    teams = [Int[] for _ in 1:n]
+    while any(remaining)
+        choices = Tuple{Float64,Int,Vector{Int}}[]
+        for i in 1:n
+            remaining[i] || continue
+            task = instance.tasks[i]
+            arrivals = sort([(ready[k] + distance(locations[k], task.pickup), k)
+                             for k in 1:m])
+            team = sort([arrivals[k][2] for k in 1:task.required_robots])
+            finish = arrivals[task.required_robots][1] + task.processing_time
+            push!(choices, (finish, i, team))
+        end
+        sort!(choices; by=x -> (x[1], x[2]))
+        _, i, team = choices[rand(rng, 1:min(rcl, length(choices)))]
+        task = instance.tasks[i]
+        finish = maximum(ready[k] + distance(locations[k], task.pickup) for k in team) +
+                 task.processing_time
+        for k in team
+            ready[k] = finish
+            locations[k] = task.delivery
+        end
+        teams[i] = team
+        push!(order, i)
+        remaining[i] = false
+    end
+    return Solution(order, teams)
+end
+
+"""Tiện ích dùng greedy của Thành viên 1 cho nghiệm đầu và greedy đa dạng cho restart."""
 function tabu_search(instance::ProblemInstance;
                      config::TabuConfig=default_tabu_config(length(instance.tasks)),
                      seed::Integer=0)
@@ -164,5 +205,6 @@ function tabu_search(instance::ProblemInstance;
     initial = make_initial(seed)
     rng = MersenneTwister(seed)
     return tabu_search(initial; config, rng,
-                       restart_initial=rng -> make_initial(rand(rng, 1:typemax(Int))))
+                       restart_initial=rng -> from_solution(problem, instance,
+                           diversified_greedy_solution(instance; rng)))
 end

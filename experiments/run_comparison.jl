@@ -25,6 +25,15 @@ function options(args)
 end
 
 function run_comparison(opts)
+    # Julia biên dịch ở lần gọi đầu; làm nóng cả hai phiên bản trước khi đo thời gian.
+    warm_instance = generate_instance(8, 5; seed=0)
+    warm_problem = FlowProblem(warm_instance)
+    warm_initial = from_solution(warm_problem, warm_instance,
+                                 greedy_initial_solution(warm_instance; seed=0))
+    for version in (:TSO, :TSR)
+        tabu_search(warm_initial; config=default_tabu_config(8, version; max_iterations=2),
+                    rng=MersenneTwister(0))
+    end
     pairs = NamedTuple[]
     runs = NamedTuple[]
     run_header = ["n", "m", "seed", "version", "initial_makespan", "best_makespan",
@@ -46,7 +55,7 @@ function run_comparison(opts)
         for version in (:TSO, :TSR)
             config = default_tabu_config(n, version; max_iterations=opts.iterations)
             next_initial(rng) = from_solution(problem, instance,
-                greedy_initial_solution(instance; seed=rand(rng, 1:typemax(Int))))
+                diversified_greedy_solution(instance; rng))
             elapsed = @elapsed result = tabu_search(initial; config,
                 rng=MersenneTwister(seed), restart_initial=next_initial)
             results[version] = result
