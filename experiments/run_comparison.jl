@@ -40,7 +40,7 @@ function run_comparison(opts)
                   "seconds", "iterations", "elite_restarts", "initial_restarts",
                   "reroute_moves", "reverse_moves", "redistribute_moves"]
     summary_header = ["n", "m", "instances", "tso_best", "tso_mean", "tsr_best", "tsr_mean",
-                      "tso_mean_seconds", "tsr_mean_seconds", "tsr_better",
+                      "tso_mean_seconds", "tsr_mean_seconds", "tsr_better", "tsr_better_percent",
                       "improvement_mean_percent", "improvement_min_percent",
                       "improvement_max_percent"]
     convergence_header = ["n", "m", "iteration", "tso_percent", "tsr_percent"]

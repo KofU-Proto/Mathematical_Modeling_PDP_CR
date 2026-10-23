@@ -40,7 +40,7 @@ nhất; nghiệm đầu của hai thuật toán vẫn là cùng nghiệm greedy 
 | 50 | 5 | 0 | 2694,53 | 2700,28 | −0,23% |
 | 50 | 10 | 1 | 1412,60 | 1394,43 | +1,36% |
 
-Tổng cộng TSR tốt hơn ở **6/12** cặp, bằng ở 2 cặp và kém ở 4 cặp. Trung bình
+Tổng cộng TSR tốt hơn ở **6/12 cặp (50%)**, bằng ở 2 cặp và kém ở 4 cặp. Trung bình
 12 mức cải thiện theo cặp là **+2,19%**. TSR chậm hơn TSO trong cả sáu nhóm
 nhỏ này; xem số giây chính xác trong `results/member3/summary.csv`.
 Các đồ thị trong `plots/member3/` cho thấy đường hội tụ tính từ incumbent,

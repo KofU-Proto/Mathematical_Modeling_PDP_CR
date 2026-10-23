@@ -51,6 +51,7 @@ end
     @test summary.tso_mean == 85.0
     @test summary.tsr_mean == 82.5
     @test summary.tsr_better == 1
+    @test summary.tsr_better_percent == 50.0
     @test summary.improvement_mean_percent ≈ (100 * 10 / 90 - 100 * 5 / 80) / 2
     curve = convergence_rows(pairs; step=1)
     @test curve[1].iteration == 0

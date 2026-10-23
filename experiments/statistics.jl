@@ -24,6 +24,7 @@ function summarize_pairs(pairs)
         group = [p for p in pairs if p.n == n && p.m == m]
         diffs = [100 * (p.tso.best_makespan - p.tsr.best_makespan) /
                  p.tso.best_makespan for p in group]
+        better = count(>(1e-9), diffs)
         push!(rows, (n=n, m=m, instances=length(group),
             tso_best=minimum(p.tso.best_makespan for p in group),
             tso_mean=mean(p.tso.best_makespan for p in group),
@@ -31,7 +32,8 @@ function summarize_pairs(pairs)
             tsr_mean=mean(p.tsr.best_makespan for p in group),
             tso_mean_seconds=mean(p.tso_seconds for p in group),
             tsr_mean_seconds=mean(p.tsr_seconds for p in group),
-            tsr_better=count(>(1e-9), diffs),
+            tsr_better=better,
+            tsr_better_percent=100 * better / length(group),
             improvement_mean_percent=mean(diffs),
             improvement_min_percent=minimum(diffs),
             improvement_max_percent=maximum(diffs)))

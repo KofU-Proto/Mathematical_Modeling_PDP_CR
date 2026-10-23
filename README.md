@@ -137,7 +137,7 @@ julia --project=. experiments/plot_results.jl results/member3/convergence.csv pl
 
 Lệnh thực nghiệm sinh cùng một instance và cùng nghiệm greedy ban đầu cho TSO
 và TSR ở mỗi bộ `(n,m,seed)`. `runs.csv` ghi từng lượt; `summary.csv` ghi
-makespan tốt nhất/trung bình, thời gian, số lần TSR tốt hơn và mức cải thiện
+makespan tốt nhất/trung bình, thời gian, số lần và tỷ lệ TSR tốt hơn, mức cải thiện
 `100 × (TSO − TSR) / TSO`; `convergence.csv` ghi makespan tốt nhất theo vòng
 theo phần trăm so với nghiệm đầu (100%). CSV được ghi dần trong quá trình chạy.
 Các SVG tương ứng nằm trong `plots/member3/`.
