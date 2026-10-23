@@ -16,8 +16,10 @@ Kích thước tabu list và số láng giềng theo Bảng 5.2: TSO có `TL_add
 `n_redis = ⌊n/15⌋`. Cả hai dừng sau 5.000 vòng, quay về nghiệm tốt nhất sau
 300 vòng không cải thiện và tạo nghiệm đầu mới sau 600 vòng. Nghiệm tốt nhất
 toàn cục được giữ qua mọi lần restart. Nghiệm đầu và mỗi nghiệm restart là nghiệm
-tốt nhất trong 50 lần chạy S-greedy Algorithm 5–6 của luận án, với khoảng chèn
-`(1,2)`. Trong một lượt, Algorithm 6 duyệt các cặp (task, robot) theo thời điểm
+tốt nhất trong 50 lần chạy S-greedy Algorithm 5–6 của luận án. Bộ tự sinh dùng
+khoảng chèn `(1,2)`; bộ Li & Lim dùng `(1,3)` ở cỡ 100 theo Bảng 4.3 của luận án
+và `(1,2)` ở các cỡ khác. Bảng 4.3 không có cỡ 500, nên `(1,2)` tại cỡ này
+là giả định. Trong một lượt, Algorithm 6 duyệt các cặp (task, robot) theo thời điểm
 đến tăng dần, gán đủ robot cho tối đa `kinsert` task và đồng bộ thời điểm kết
 thúc của các robot được gán. Hàm trả về `Solution` phần 1, sau đó chuyển sang
 `FlowSolution` phần 2 để Tabu Search sử dụng.
@@ -60,22 +62,52 @@ lần lượt là **2362,31 / 2354,32**. Dữ liệu chi tiết ở
 `results/member3/synthetic_n100/`. Đây vẫn là tọa độ sinh đều ngẫu nhiên, không
 phải instance Li & Lim mà bài báo đã chuyển đổi.
 
-## Phạm vi và bước cải thiện
+## Li & Lim theo mô tả luận án
 
-Kết quả trên **không xác nhận** con số khoảng 1,66% và 8/10 trong Bảng 5 của
-bản special issue. Bảng đó dùng các instance PDP Li & Lim đã biến đổi với
-100–500 task, 10 instance mỗi kích thước và 10 robot. Thực nghiệm ở đây dùng
-instance ngẫu nhiên 15–100 task; nhóm nhỏ chỉ có hai seed. Algorithm 5–6 và
-best-of-50 đã được cài, nhưng không có dữ liệu gốc và cách chọn biến thể
-S-greedy theo từng kích thước ở đây dùng cố định khoảng `(1,2)`. Các chi tiết
-chọn láng giềng của phần 2 cũng có thể khác hiện thực tác giả. Vì vậy không thể dùng
-chênh lệch ở đây để kiểm định độ trung thực của kết quả gốc.
+Đã nhập 50 file `LC1_x_1..10` với `x ∈ {2,4,6,8,10}` từ
+[bản sao PyVRP](https://github.com/PyVRP/Instances/tree/main/PDPTW) của
+[benchmark SINTEF](https://www.sintef.no/projectweb/top/pdptw/li-lim-benchmark/).
+Mỗi cặp pickup-delivery thành một task PDP-CR; tọa độ và depot
+giữ nguyên; thời gian xử lý bằng khoảng cách Euclid; nhu cầu robot lấy đều từ
+`1..5` với seed chuyển đổi 42. Các file, hash SHA-256 và nguồn được ghi ở
+`data/li_lim_raw/`. Cỡ `n` trong bảng là tên lớp danh nghĩa; số cặp thực tế
+được ghi ở `actual_tasks` trong `runs.csv` và dùng tính số láng giềng, tabu size.
+Mỗi cặp TSO/TSR dùng cùng instance, cùng nghiệm đầu và 5.000 vòng. Seed tìm
+kiếm là thứ tự file khi sắp tên trong từng lớp (1–10). Bảng 4.2 của luận án
+liệt kê đích danh `LC1_2_1..10` và `LC1_4_1..10` cho thí nghiệm greedy; chưa
+có danh sách 10 file của Bảng 5.
 
-Bộ Li & Lim gốc có công khai tại SINTEF. Luận án Chương 2 cho biết tên instance
-chuyển đổi có dạng `LC1_x_y-5` (ví dụ `LC1_4_3-5` chứa 200 task), nhưng chưa
-cho biết chính xác 10 file được chọn ở mỗi cỡ và seed sinh nhu cầu robot. Ưu tiên
-tiếp theo là nhập các file Li & Lim, lưu rõ tên file, depot và seed chuyển đổi,
-rồi chạy 10 instance mỗi kích thước lớn với cùng cấu hình. Sau đó lặp nhiều
-seed cho heuristic để ước lượng độ biến thiên và kiểm tra lại điều kiện chọn láng
-giềng của phần 2. Khi thiếu file đã chuyển đổi của tác giả, chỉ nên gọi kết quả
-đó là *tái lập theo mô tả*, không gọi là tái tạo đúng Bảng 5.
+| n | TSR tốt hơn / 10 | Gap trung bình theo luận án | Paper Bảng 5: số tốt hơn | Paper Bảng 5: gap |
+|---:|---:|---:|---:|---:|
+| 100 | 8 | +1,87% | 8 | +2,35% |
+| 200 | 10 | +1,86% | 8 | +1,21% |
+| 300 | 8 | +1,83% | 7 | +0,51% |
+| 400 | 6 | +0,63% | 9 | +1,71% |
+| 500 | 8 | +1,40% | 8 | +2,53% |
+
+Trung bình năm lớp là **+1,52%**, gần con số **+1,66%** của paper; từng lớp
+vẫn khác, đặc biệt cỡ 400. Gap ở bảng này tính theo công thức được in trong
+luận án: `100 × (TSO − TSR) / TSR`. Các `summary.csv` gốc còn lưu chỉ số
+`100 × (TSO − TSR) / TSO`, nên không so trực tiếp cột đó với bảng trên.
+
+Đây là phép **tái lập theo mô tả**, chưa phải tái tạo đúng Bảng 5: seed sinh nhu
+cầu robot, file đã chuyển đổi và 10 instance tác giả chọn cho từng hàng chưa
+được công bố. S-greedy của ta trên `LC1_2_1` với seed 42 cho nghiệm đầu 875,1
+ở biến thể `(1,2)`, trong khi Bảng 4.2 báo best-of-50 là 917,1; chỉ riêng
+điểm đối chiếu này đã xác nhận dữ liệu hoặc ngẫu nhiên hóa chưa trùng tác giả.
+Thời gian chạy cũng không so được trực tiếp vì mã Julia và môi trường khác
+Python 3.9 trên Intel i5-8400 của paper.
+
+## Phân tích ứng viên redistribute không đổi nghiệm
+
+Trong 10 nghiệm đầu `LC1_2` kiểm tra bằng `(1,2)`, **948/1.064** vị trí cắt
+(89,1%) trả về `changes=[]`: flow không đổi nhưng mã ban đầu vẫn tính là một
+ứng viên redistribute. Có thêm tùy chọn
+`--redistribute-skip-unchanged=true`: thử các vị trí cắt cho đến khi thu đủ
+số ứng viên thật sự đổi flow hoặc hết vị trí. Mặc định cũ vẫn được giữ để đối
+chiếu. Paper không mô tả rõ có bỏ ứng viên không đổi hay không, nên kết quả tùy
+chọn này là phân tích độ nhạy, không được trình bày như tái tạo paper.
+
+Với cỡ 100 và đúng S-greedy `(1,3)`, chế độ mặc định cho **8/10, +1,87%**;
+chế độ bỏ ứng viên không đổi cho **9/10, +3,01%** theo cùng công thức luận án.
+Các kết quả chi tiết nằm trong các thư mục `results/member3/li_lim_lc1_*`.
