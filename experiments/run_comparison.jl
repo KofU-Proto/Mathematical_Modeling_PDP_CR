@@ -9,6 +9,7 @@ function options(args)
                 "iterations" => "5000", "step" => "100",
                 "initial-trials" => "50", "k-range" => "1,2",
                 "input-dir" => "", "demand-seed" => "42",
+                "file-prefix" => "",
                 "redistribute-skip-unchanged" => "false",
                 "output" => joinpath(@__DIR__, "..", "results", "member3"))
     for arg in args
@@ -35,6 +36,7 @@ function options(args)
         throw(ArgumentError("redistribute-skip-unchanged phải là true hoặc false"))
     return (; sizes, robots, seeds, iterations, step, initial_trials, k_range,
              input_dir=opts["input-dir"], demand_seed=parse(Int, opts["demand-seed"]),
+             file_prefix=opts["file-prefix"],
              redistribute_skip_unchanged=skip_text == "true",
              output=opts["output"])
 end
@@ -46,7 +48,9 @@ function experiment_cases(opts)
                 for n in opts.sizes for m in opts.robots for seed in opts.seeds]
     end
     isdir(opts.input_dir) || throw(ArgumentError("Không tìm thấy input-dir: $(opts.input_dir)"))
-    files = sort(filter(name -> endswith(lowercase(name), ".vrp"), readdir(opts.input_dir)))
+    files = sort(filter(name -> endswith(lowercase(name), ".vrp") &&
+                              startswith(lowercase(name), lowercase(opts.file_prefix)),
+                        readdir(opts.input_dir)))
     isempty(files) && throw(ArgumentError("input-dir không có file .vrp"))
     cases = NamedTuple[]
     for (index, file) in enumerate(files)

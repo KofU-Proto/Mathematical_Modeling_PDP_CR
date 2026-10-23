@@ -158,15 +158,22 @@ khoảng cách Euclid và sinh nhu cầu robot đều từ `1..5`. Seed chuyển
 ghi vào `runs.csv`; `source` là tên file gốc, `actual_tasks` là số cặp thực tế.
 Các file trong nhóm `n=100` này thực tế có 103–107 cặp. `SHA256SUMS` ghi hash
 từng file để kiểm tra nguồn dữ liệu.
-Khi dùng `--input-dir`, script chạy mọi file `.vrp` trong thư mục theo thứ tự
+Khi dùng `--input-dir`, script chạy các file `.vrp` khớp `--file-prefix` theo thứ tự
 tên, gán seed tìm kiếm `1..số file` theo thứ tự đó; `--demand-seed` chỉ dùng để
-sinh nhu cầu robot, còn `--sizes` và `--seeds` không được áp dụng. Tham số tabu
+sinh nhu cầu robot, còn `--sizes` và `--seeds` không được áp dụng. Chạy từng
+nhóm riêng để seed tìm kiếm bắt đầu lại từ 1. Tham số tabu
 và số láng giềng được tính từ `actual_tasks`, trong khi `n` ở bảng tổng hợp là
 cỡ lớp danh nghĩa của Li & Lim.
 
 ```bash
-julia --project=. experiments/run_comparison.jl --input-dir=data/li_lim_raw --robots=10 --demand-seed=42 --iterations=5000 --initial-trials=50 --k-range=1,2 --output=results/member3/li_lim_lc1_all
+julia --project=. experiments/run_comparison.jl --input-dir=data/li_lim_raw --file-prefix=lc1_2_ --robots=10 --demand-seed=42 --iterations=5000 --initial-trials=50 --k-range=1,3 --output=results/member3/li_lim_lc1_2_paper_init
+for x in 4 6 8 10; do
+  julia --project=. experiments/run_comparison.jl --input-dir=data/li_lim_raw --file-prefix=lc1_${x}_ --robots=10 --demand-seed=42 --iterations=5000 --initial-trials=50 --k-range=1,2 --output=results/member3/li_lim_lc1_${x}
+done
 ```
+
+Bảng 4.3 của luận án chọn S-greedy `(1,3)` cho `m=10, n=100` và `(1,2)` cho
+`n=200..400`. Cỡ 500 không có trong bảng nên dùng `(1,2)` như giả định.
 
 Đây là tái lập theo mô tả luận án trên một tập `LC1` được công bố. Chưa biết
 chính xác 10 file mỗi kích thước và seed chuyển đổi mà tác giả đã dùng, nên
