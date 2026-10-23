@@ -2,6 +2,8 @@ using Test
 using Random
 include(joinpath(@__DIR__, "..", "src", "PDPCR.jl"))
 using .PDPCRMember1, .PDPCRMember2, .PDPCRMember3
+include(joinpath(@__DIR__, "..", "experiments", "statistics.jl"))
+using .ExperimentStatistics
 
 @testset "Tabu Search: tham số và bất biến" begin
     tso = default_tabu_config(150, :TSO)
@@ -28,6 +30,29 @@ using .PDPCRMember1, .PDPCRMember2, .PDPCRMember3
         @test sum(values(result.selected_moves)) <= result.iterations
         version === :TSO && @test result.selected_moves[:redistribute] == 0
     end
+end
+
+@testset "Thống kê cặp và đường hội tụ" begin
+    pairs = [
+        (n=15, m=5, seed=1,
+         tso=(best_makespan=90.0, initial_makespan=100.0, history=[100.0, 90.0]),
+         tsr=(best_makespan=80.0, initial_makespan=100.0, history=[100.0, 80.0]),
+         tso_seconds=2.0, tsr_seconds=3.0),
+        (n=15, m=5, seed=2,
+         tso=(best_makespan=80.0, initial_makespan=100.0, history=[100.0, 80.0]),
+         tsr=(best_makespan=85.0, initial_makespan=100.0, history=[100.0, 85.0]),
+         tso_seconds=4.0, tsr_seconds=5.0),
+    ]
+    summary = only(summarize_pairs(pairs))
+    @test summary.instances == 2
+    @test summary.tso_mean == 85.0
+    @test summary.tsr_mean == 82.5
+    @test summary.tsr_better == 1
+    @test summary.improvement_mean_percent ≈ (100 * 10 / 90 - 100 * 5 / 80) / 2
+    curve = convergence_rows(pairs; step=1)
+    @test curve[1].iteration == 0
+    @test curve[1].tso_percent == 100
+    @test curve[end].tsr_percent == 82.5
 end
 
 @testset "Tabu Search: restart và FIFO" begin
