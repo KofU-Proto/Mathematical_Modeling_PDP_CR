@@ -105,6 +105,7 @@ Base.@kwdef struct NeighborhoodConfig
     n_redis::Union{Nothing,Int} = nothing
     n_reroute::Union{Nothing,Int} = nothing
     n_reverse::Union{Nothing,Int} = nothing
+    redistribute_skip_unchanged::Bool = false
     reroute_variant::Symbol = :max_ca_delta
     reverse_critical_only::Bool = true
     validate::Bool = false
@@ -138,7 +139,9 @@ function generate_neighbors(
     isnothing(ev) && throw(ArgumentError("Flow graph có chu trình"))
     result = Candidate[]
     if config.n_redis != 0
-        append!(result, redistribute_neighbors(s; ev, limit=config.n_redis, rng, validate=config.validate))
+        append!(result, redistribute_neighbors(s; ev, limit=config.n_redis, rng,
+                                               skip_unchanged=config.redistribute_skip_unchanged,
+                                               validate=config.validate))
     end
     if config.n_reroute != 0
         append!(result, reroute_neighbors(

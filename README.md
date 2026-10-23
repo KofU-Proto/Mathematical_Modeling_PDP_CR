@@ -158,6 +158,11 @@ khoảng cách Euclid và sinh nhu cầu robot đều từ `1..5`. Seed chuyển
 ghi vào `runs.csv`; `source` là tên file gốc, `actual_tasks` là số cặp thực tế.
 Các file trong nhóm `n=100` này thực tế có 103–107 cặp. `SHA256SUMS` ghi hash
 từng file để kiểm tra nguồn dữ liệu.
+Khi dùng `--input-dir`, script chạy mọi file `.vrp` trong thư mục theo thứ tự
+tên, gán seed tìm kiếm `1..số file` theo thứ tự đó; `--demand-seed` chỉ dùng để
+sinh nhu cầu robot, còn `--sizes` và `--seeds` không được áp dụng. Tham số tabu
+và số láng giềng được tính từ `actual_tasks`, trong khi `n` ở bảng tổng hợp là
+cỡ lớp danh nghĩa của Li & Lim.
 
 ```bash
 julia --project=. experiments/run_comparison.jl --input-dir=data/li_lim_raw --robots=10 --demand-seed=42 --iterations=5000 --initial-trials=50 --k-range=1,2 --output=results/member3/li_lim_lc1_all
@@ -166,3 +171,10 @@ julia --project=. experiments/run_comparison.jl --input-dir=data/li_lim_raw --ro
 Đây là tái lập theo mô tả luận án trên một tập `LC1` được công bố. Chưa biết
 chính xác 10 file mỗi kích thước và seed chuyển đổi mà tác giả đã dùng, nên
 không coi số liệu là phép tái tạo đúng Bảng 5.
+
+`redistribute_neighbors` có tùy chọn `skip_unchanged=true`. Khi bật qua
+`--redistribute-skip-unchanged=true`, script lấy mẫu các vị trí cắt cho đến
+khi có đủ số láng giềng **thực sự đổi flow** hoặc đã thử hết các vị trí.
+Mặc định là `false` để giữ nguyên cách sinh ứng viên ban đầu. Đây là một phân
+tích độ nhạy có kết quả lưu riêng ở `results/member3/li_lim_lc1_*_changed/`;
+paper không nêu rõ có loại vị trí cắt không đổi nghiệm hay không.

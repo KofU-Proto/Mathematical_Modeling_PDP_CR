@@ -254,18 +254,21 @@ function redistribute_neighbors(
     limit::Union{Nothing,Integer}=nothing,
     zetas=nothing,
     rng::AbstractRNG=Random.default_rng(),
+    skip_unchanged::Bool=false,
     validate::Bool=false,
 )
     ev = isnothing(ev) ? evaluate(s) : ev
     positions = isnothing(zetas) ? collect(cut_positions(s)) : collect(zetas)
     if !isnothing(limit) && isnothing(zetas)
         shuffle!(rng, positions)
-        positions = positions[1:min(limit, length(positions))]
+        skip_unchanged || (positions = positions[1:min(limit, length(positions))])
     end
     candidates = Candidate[]
     for z in positions
         changes, _, before, after, _ = redistribute_changes(s, z; ev, rng)
+        skip_unchanged && isempty(changes) && continue
         _push_candidate!(candidates, s, RedistributeMove(z), changes, before, after, validate)
+        !isnothing(limit) && length(candidates) >= limit && break
     end
     return candidates
 end

@@ -9,6 +9,7 @@ function options(args)
                 "iterations" => "5000", "step" => "100",
                 "initial-trials" => "50", "k-range" => "1,2",
                 "input-dir" => "", "demand-seed" => "42",
+                "redistribute-skip-unchanged" => "false",
                 "output" => joinpath(@__DIR__, "..", "results", "member3"))
     for arg in args
         startswith(arg, "--") && occursin('=', arg) ||
@@ -29,8 +30,12 @@ function options(args)
     k_range = (range_values[1], range_values[2])
     initial_trials >= 1 && 1 <= k_range[1] <= k_range[2] ||
         throw(ArgumentError("cần initial-trials >= 1 và 1 <= k1 <= k2"))
+    skip_text = lowercase(opts["redistribute-skip-unchanged"])
+    skip_text in ("true", "false") ||
+        throw(ArgumentError("redistribute-skip-unchanged phải là true hoặc false"))
     return (; sizes, robots, seeds, iterations, step, initial_trials, k_range,
              input_dir=opts["input-dir"], demand_seed=parse(Int, opts["demand-seed"]),
+             redistribute_skip_unchanged=skip_text == "true",
              output=opts["output"])
 end
 
@@ -71,7 +76,7 @@ function run_comparison(opts)
     end
     pairs = NamedTuple[]
     runs = NamedTuple[]
-    run_header = ["n", "actual_tasks", "m", "seed", "source", "demand_seed", "version", "initial_makespan", "best_makespan",
+    run_header = ["n", "actual_tasks", "m", "seed", "source", "demand_seed", "redistribute_skip_unchanged", "version", "initial_makespan", "best_makespan",
                   "seconds", "iterations", "initial_trials", "k1", "k2",
                   "elite_restarts", "initial_restarts",
                   "reroute_moves", "reverse_moves", "redistribute_moves"]
@@ -92,8 +97,13 @@ function run_comparison(opts)
         results = Dict{Symbol,TabuResult}()
         seconds = Dict{Symbol,Float64}()
         for version in (:TSO, :TSR)
+            neighborhood = default_config(actual_n, version)
+            neighborhood = NeighborhoodConfig(; n_redis=neighborhood.n_redis,
+                n_reroute=neighborhood.n_reroute, n_reverse=neighborhood.n_reverse,
+                redistribute_skip_unchanged=opts.redistribute_skip_unchanged)
             config = default_tabu_config(actual_n, version; max_iterations=opts.iterations,
-                initial_trials=opts.initial_trials, initial_k_range=opts.k_range)
+                initial_trials=opts.initial_trials, initial_k_range=opts.k_range,
+                neighborhood)
             next_initial(rng) = from_solution(problem, instance,
                 best_s_greedy_solution(instance; rng, k_range=opts.k_range,
                     trials=opts.initial_trials))
@@ -102,7 +112,8 @@ function run_comparison(opts)
             results[version] = result
             seconds[version] = elapsed
             push!(runs, (n=n, actual_tasks=actual_n, m=m, seed=seed, source=source,
-                demand_seed=isempty(opts.input_dir) ? "" : opts.demand_seed, version=version,
+                demand_seed=isempty(opts.input_dir) ? "" : opts.demand_seed,
+                redistribute_skip_unchanged=opts.redistribute_skip_unchanged, version=version,
                 initial_makespan=result.initial_makespan,
                 best_makespan=result.best_makespan, seconds=elapsed,
                 iterations=result.iterations, initial_trials=opts.initial_trials,

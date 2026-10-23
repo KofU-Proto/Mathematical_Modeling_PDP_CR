@@ -43,6 +43,21 @@ EOF
     end
 end
 
+@testset "Redistribute chỉ lấy láng giềng có thay đổi (tùy chọn)" begin
+    path = joinpath(@__DIR__, "..", "data", "li_lim_raw", "lc1_2_1.vrp")
+    inst = load_li_lim_vrp(path, 10; seed=42)
+    sol = best_s_greedy_solution(inst; rng=MersenneTwister(1), trials=50)
+    flow = from_solution(FlowProblem(inst), inst, sol)
+    all_candidates = redistribute_neighbors(flow; rng=MersenneTwister(1))
+    changed = redistribute_neighbors(flow; limit=7, skip_unchanged=true,
+                                     rng=MersenneTwister(1), validate=true)
+    @test any(c -> isempty(c.changes), all_candidates)
+    @test !isempty(changed)
+    @test length(changed) <= 7
+    @test all(c -> !isempty(c.changes), changed)
+    @test all(c -> makespan(materialize(flow, c)) ≈ c.after, changed)
+end
+
 @testset "Tabu Search: tham số và bất biến" begin
     tso = default_tabu_config(150, :TSO)
     tsr = default_tabu_config(150, :TSR)
