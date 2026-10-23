@@ -9,7 +9,6 @@ ngoài.
 Mở PowerShell tại thư mục project:
 
 ```powershell
-Set-Location "\Mathematical_Modeling_PDP_CR"
 julia --project=. test/runtests.jl
 ```
 
@@ -165,13 +164,6 @@ nhóm riêng để seed tìm kiếm bắt đầu lại từ 1. Tham số tabu
 và số láng giềng được tính từ `actual_tasks`, trong khi `n` ở bảng tổng hợp là
 cỡ lớp danh nghĩa của Li & Lim.
 
-```bash
-julia --project=. experiments/run_comparison.jl --input-dir=data/li_lim_raw --file-prefix=lc1_2_ --robots=10 --demand-seed=42 --iterations=5000 --initial-trials=50 --k-range=1,3 --output=results/member3/li_lim_lc1_2_paper_init
-for x in 4 6 8 10; do
-  julia --project=. experiments/run_comparison.jl --input-dir=data/li_lim_raw --file-prefix=lc1_${x}_ --robots=10 --demand-seed=42 --iterations=5000 --initial-trials=50 --k-range=1,2 --output=results/member3/li_lim_lc1_${x}
-done
-```
-
 Bảng 4.3 của luận án chọn S-greedy `(1,3)` cho `m=10, n=100` và `(1,2)` cho
 `n=200..400`. Cỡ 500 không có trong bảng nên dùng `(1,2)` như giả định.
 
@@ -179,9 +171,60 @@ Bảng 4.3 của luận án chọn S-greedy `(1,3)` cho `m=10, n=100` và `(1,2)
 chính xác 10 file mỗi kích thước và seed chuyển đổi mà tác giả đã dùng, nên
 không coi số liệu là phép tái tạo đúng Bảng 5.
 
-`redistribute_neighbors` có tùy chọn `skip_unchanged=true`. Khi bật qua
-`--redistribute-skip-unchanged=true`, script lấy mẫu các vị trí cắt cho đến
-khi có đủ số láng giềng **thực sự đổi flow** hoặc đã thử hết các vị trí.
-Mặc định là `false` để giữ nguyên cách sinh ứng viên ban đầu. Đây là một phân
-tích độ nhạy có kết quả lưu riêng ở `results/member3/li_lim_lc1_*_changed/`;
-paper không nêu rõ có loại vị trí cắt không đổi nghiệm hay không.
+#### Chạy lại thực nghiệm Li & Lim
+
+Mở terminal tại thư mục gốc repo (`Mathematical_Modeling_PDP_CR`). Cần Julia
+trong `PATH`; nhóm chạy bằng Julia 1.13.2, chỉ dùng standard library. Kiểm tra
+dữ liệu và code trước:
+
+```bash
+sha256sum -c data/li_lim_raw/SHA256SUMS   # Linux/WSL; kiểm tra đủ 50 file nguồn
+julia --project=. test/test_member2.jl
+julia --project=. test/test_member3.jl
+```
+
+Chạy cấu hình chính, mỗi nhóm 10 file và cùng nghiệm đầu cho TSO/TSR. Các lệnh
+dưới đây dùng Bash/zsh; có thể chạy mỗi nhóm trong một terminal riêng nếu muốn
+song song. `runs.csv` được ghi sau từng phiên bản, `summary.csv` sau từng cặp.
+
+```bash
+julia --project=. experiments/run_comparison.jl --input-dir=data/li_lim_raw --file-prefix=lc1_2_ --robots=10 --demand-seed=42 --iterations=5000 --initial-trials=50 --k-range=1,3 --output=results/member3/li_lim_lc1_2_paper_init
+for x in 4 6 8 10; do
+  julia --project=. experiments/run_comparison.jl --input-dir=data/li_lim_raw --file-prefix=lc1_${x}_ --robots=10 --demand-seed=42 --iterations=5000 --initial-trials=50 --k-range=1,2 --output=results/member3/li_lim_lc1_${x}
+done
+```
+
+Trong PowerShell, dòng lặp tương ứng là:
+
+```powershell
+julia --project=. experiments/run_comparison.jl --input-dir=data/li_lim_raw --file-prefix=lc1_2_ --robots=10 --demand-seed=42 --iterations=5000 --initial-trials=50 --k-range=1,3 --output=results/member3/li_lim_lc1_2_paper_init
+foreach ($x in 4,6,8,10) {
+  julia --project=. experiments/run_comparison.jl --input-dir=data/li_lim_raw "--file-prefix=lc1_${x}_" --robots=10 --demand-seed=42 --iterations=5000 --initial-trials=50 --k-range=1,2 "--output=results/member3/li_lim_lc1_${x}"
+}
+```
+
+Để kiểm tra ảnh hưởng của ứng viên redistribute **không đổi flow**, chạy lại
+cùng các lệnh trên với `--redistribute-skip-unchanged=true` và thêm `_changed`
+vào tên thư mục `--output`. Ví dụ nhóm 100:
+
+```bash
+julia --project=. experiments/run_comparison.jl --input-dir=data/li_lim_raw --file-prefix=lc1_2_ --robots=10 --demand-seed=42 --iterations=5000 --initial-trials=50 --k-range=1,3 --redistribute-skip-unchanged=true --output=results/member3/li_lim_lc1_2_paper_init_changed
+for x in 4 6 8 10; do
+  julia --project=. experiments/run_comparison.jl --input-dir=data/li_lim_raw --file-prefix=lc1_${x}_ --robots=10 --demand-seed=42 --iterations=5000 --initial-trials=50 --k-range=1,2 --redistribute-skip-unchanged=true --output=results/member3/li_lim_lc1_${x}_changed
+done
+```
+
+Sau khi **cả hai cấu hình** chạy đủ 10 file mỗi nhóm, tạo bảng và biểu đồ:
+
+```bash
+julia --project=. experiments/summarize_li_lim.jl
+julia --project=. experiments/plot_results.jl results/member3/li_lim_convergence_default.csv plots/member3/li_lim_default
+julia --project=. experiments/plot_results.jl results/member3/li_lim_convergence_changed.csv plots/member3/li_lim_changed
+```
+
+`results/member3/li_lim_comparison.csv` chứa hai chế độ và con số Bảng 5 để
+đối chiếu. Cột `gap_paper_percent` tính `100 × (TSO − TSR) / TSR` theo công
+thức trong luận án; `summary.csv` của từng lượt vẫn dùng mẫu số TSO.
+`report/member3_tabu_search.md` giải thích các sai khác còn lại. Tùy chọn lọc
+láng giềng là phân tích độ nhạy; paper không nêu rõ cách xử lý vị trí cắt không
+đổi nghiệm, nên không coi nó là thiết lập chắc chắn của tác giả.
