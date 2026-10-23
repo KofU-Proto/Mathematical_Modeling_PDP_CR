@@ -1,0 +1,2 @@
+n,m,instances,tso_best,tso_mean,tsr_best,tsr_mean,tso_mean_seconds,tsr_mean_seconds,tsr_better,tsr_better_percent,improvement_mean_percent,improvement_min_percent,improvement_max_percent
+400,10,10,3874.8569463194794,4967.151362396592,3770.125930354606,4939.738391357171,38.658260831499994,35.596109243700006,6,60.0,0.5942514722358249,-3.3208398064726046,2.7028356766654738
