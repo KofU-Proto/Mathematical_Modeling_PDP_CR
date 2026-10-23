@@ -5,6 +5,7 @@ using Statistics
 const RESULT_ROOT = joinpath(@__DIR__, "..", "results", "member3")
 const CLASSES = [(100, "2_paper_init"), (200, "4"), (300, "6"),
                  (400, "8"), (500, "10")]
+# Table 5 của Thao_ICAMCS_special_issue.pdf; Bảng 5.3 luận án 2025 chỉ đến n=400.
 const PAPER = Dict(100 => (8, 2.35), 200 => (8, 1.21),
                    300 => (7, 0.51), 400 => (9, 1.71), 500 => (8, 2.53))
 

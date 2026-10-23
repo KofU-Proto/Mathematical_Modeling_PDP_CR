@@ -167,9 +167,11 @@ cỡ lớp danh nghĩa của Li & Lim.
 Bảng 4.3 của luận án chọn S-greedy `(1,3)` cho `m=10, n=100` và `(1,2)` cho
 `n=200..400`. Cỡ 500 không có trong bảng nên dùng `(1,2)` như giả định.
 
-Đây là tái lập theo mô tả luận án trên một tập `LC1` được công bố. Chưa biết
-chính xác 10 file mỗi kích thước và seed chuyển đổi mà tác giả đã dùng, nên
-không coi số liệu là phép tái tạo đúng Bảng 5.
+Đây là tái lập theo mô tả luận án trên một tập `LC1` được công bố. Bảng 5
+của bài *Thao_ICAMCS_special_issue* có hàng `n=500`; Bảng 5.3 của luận án 2025
+chỉ báo cáo Tabu Search đến `n=400`. Chưa biết chính xác 10 file mỗi kích thước
+và seed chuyển đổi mà tác giả đã dùng, nên không coi số liệu là phép tái tạo
+đúng Bảng 5 của bài special issue.
 
 #### Chạy lại thực nghiệm Li & Lim
 

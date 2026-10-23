@@ -72,8 +72,11 @@ giữ nguyên; thời gian xử lý bằng khoảng cách Euclid; nhu cầu robo
 `1..5` với seed chuyển đổi 42. Các file, hash SHA-256 và nguồn được ghi ở
 `data/li_lim_raw/`. Cỡ `n` trong bảng là tên lớp danh nghĩa; số cặp thực tế
 được ghi ở `actual_tasks` trong `runs.csv` và dùng tính số láng giềng, tabu size.
-Mỗi cặp TSO/TSR dùng cùng instance, cùng nghiệm đầu và 5.000 vòng. Seed tìm
-kiếm là thứ tự file khi sắp tên trong từng lớp (1–10). Bảng 4.2 của luận án
+Mỗi cặp TSO/TSR dùng cùng instance, cùng nghiệm đầu và 5.000 vòng. Các con số
+paper trong bảng đối chiếu lấy từ Bảng 5 của bài *Thao_ICAMCS_special_issue*;
+luận án 2025 có Bảng 5.3 riêng và chỉ đến `n=400`. Với lớp `LC1_10`, tên
+`n=500` là danh nghĩa, còn mỗi file nhập vào có 519–529 cặp task thực tế.
+Seed tìm kiếm là thứ tự file khi sắp tên trong từng lớp (1–10). Bảng 4.2 của luận án
 liệt kê đích danh `LC1_2_1..10` và `LC1_4_1..10` cho thí nghiệm greedy; chưa
 có danh sách 10 file của Bảng 5.
 
