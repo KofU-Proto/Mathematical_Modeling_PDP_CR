@@ -52,17 +52,30 @@ nhỏ này; xem số giây chính xác trong `results/member3/summary.csv`.
 Các đồ thị trong `plots/member3/` cho thấy đường hội tụ tính từ incumbent,
 tương tự cách chuẩn hóa của Hình 12: 100% là nghiệm đầu, thấp hơn là tốt hơn.
 
+Để kiểm tra ảnh hưởng của kích thước bài toán, chạy thêm **10 instance tự sinh**
+với `n=100`, `m=10`, seed `1..10`, 5.000 vòng và cùng quy trình best-of-50
+S-greedy. Tại kích thước này TSR tốt hơn ở **7/10** instance, cải thiện trung bình
+theo cặp **+0,33%** (min **−0,84%**, max **+2,56%**). Makespan trung bình TSO/TSR
+lần lượt là **2362,31 / 2354,32**. Dữ liệu chi tiết ở
+`results/member3/synthetic_n100/`. Đây vẫn là tọa độ sinh đều ngẫu nhiên, không
+phải instance Li & Lim mà bài báo đã chuyển đổi.
+
 ## Phạm vi và bước cải thiện
 
 Kết quả trên **không xác nhận** con số khoảng 1,66% và 8/10 trong Bảng 5 của
 bản special issue. Bảng đó dùng các instance PDP Li & Lim đã biến đổi với
 100–500 task, 10 instance mỗi kích thước và 10 robot. Thực nghiệm ở đây dùng
-instance ngẫu nhiên 15–50 task và chỉ hai seed mỗi nhóm. Algorithm 5–6 và
+instance ngẫu nhiên 15–100 task; nhóm nhỏ chỉ có hai seed. Algorithm 5–6 và
 best-of-50 đã được cài, nhưng không có dữ liệu gốc và cách chọn biến thể
 S-greedy theo từng kích thước ở đây dùng cố định khoảng `(1,2)`. Các chi tiết
 chọn láng giềng của phần 2 cũng có thể khác hiện thực tác giả. Vì vậy không thể dùng
 chênh lệch ở đây để kiểm định độ trung thực của kết quả gốc.
 
-Ưu tiên tiếp theo là nhập các instance Li & Lim gốc và quy trình biến đổi, rồi chạy 10 instance mỗi kích thước lớn
-với cùng phần cứng và cấu hình. Sau đó nên lặp nhiều seed cho heuristic để
-ước lượng độ biến thiên và kiểm tra lại điều kiện chọn láng giềng của phần 2.
+Bộ Li & Lim gốc có công khai tại SINTEF. Luận án Chương 2 cho biết tên instance
+chuyển đổi có dạng `LC1_x_y-5` (ví dụ `LC1_4_3-5` chứa 200 task), nhưng chưa
+cho biết chính xác 10 file được chọn ở mỗi cỡ và seed sinh nhu cầu robot. Ưu tiên
+tiếp theo là nhập các file Li & Lim, lưu rõ tên file, depot và seed chuyển đổi,
+rồi chạy 10 instance mỗi kích thước lớn với cùng cấu hình. Sau đó lặp nhiều
+seed cho heuristic để ước lượng độ biến thiên và kiểm tra lại điều kiện chọn láng
+giềng của phần 2. Khi thiếu file đã chuyển đổi của tác giả, chỉ nên gọi kết quả
+đó là *tái lập theo mô tả*, không gọi là tái tạo đúng Bảng 5.
