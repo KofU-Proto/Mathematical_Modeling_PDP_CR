@@ -108,6 +108,24 @@ số ứng viên thật sự đổi flow hoặc hết vị trí. Mặc định c
 chiếu. Paper không mô tả rõ có bỏ ứng viên không đổi hay không, nên kết quả tùy
 chọn này là phân tích độ nhạy, không được trình bày như tái tạo paper.
 
-Với cỡ 100 và đúng S-greedy `(1,3)`, chế độ mặc định cho **8/10, +1,87%**;
-chế độ bỏ ứng viên không đổi cho **9/10, +3,01%** theo cùng công thức luận án.
-Các kết quả chi tiết nằm trong các thư mục `results/member3/li_lim_lc1_*`.
+Đã chạy đủ 50 cặp TSO/TSR cho cả hai chế độ, cùng file đầu vào, seed và nghiệm
+đầu. Bảng sau dùng mẫu số TSR như công thức trong luận án:
+
+| n | Mặc định: TSR tốt hơn / 10 | Mặc định: gap | Lọc ứng viên không đổi: TSR tốt hơn / 10 | Lọc ứng viên không đổi: gap | Paper: gap |
+|---:|---:|---:|---:|---:|---:|
+| 100 | 8 | +1,87% | 9 | +3,01% | +2,35% |
+| 200 | 10 | +1,87% | 9 | +3,71% | +1,21% |
+| 300 | 8 | +1,83% | 9 | +2,44% | +0,51% |
+| 400 | 6 | +0,63% | 9 | +1,39% | +1,71% |
+| 500 | 8 | +1,40% | 9 | +1,77% | +2,53% |
+
+Trung bình năm lớp là **+1,52%** ở chế độ mặc định, **+2,46%** khi lọc ứng
+viên không đổi và **+1,66%** trong paper. Việc lọc làm TSR tốt hơn ở cả năm
+lớp trên dữ liệu này, nhưng mức gap mới không đồng nhất với paper. Đặc biệt,
+TSR tốt hơn 9/10 ở cỡ 400 sau lọc, trùng số lượng paper, còn gap là 1,39%
+so với 1,71%. Điều này không xác định được tác giả có dùng cách lọc hay không;
+thiếu instance chuyển đổi và seed gốc vẫn là giới hạn chính của việc đối chiếu.
+
+Chi tiết từng lượt nằm trong `results/member3/li_lim_lc1_*/runs.csv`, bảng
+đối chiếu trong `results/member3/li_lim_comparison.csv`, và đồ thị hội tụ ở
+`plots/member3/li_lim_default/` và `plots/member3/li_lim_changed/`.

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="TSO và TSR: makespan tốt nhất theo iteration">
+<rect width="960" height="540" fill="white"/>
+<text x="82" y="34" font-family="sans-serif" font-size="21">Hội tụ TSO / TSR · n=100, m=10</text>
+<line x1="82" x2="925" y1="468.0" y2="468.0" stroke="#e5e7eb"/>
+<text x="70" y="473.0" text-anchor="end" font-family="sans-serif" font-size="13">88.0%</text>
+<line x1="82" x2="925" y1="386.0000000000002" y2="386.0000000000002" stroke="#e5e7eb"/>
+<text x="70" y="391.0000000000002" text-anchor="end" font-family="sans-serif" font-size="13">90.6%</text>
+<line x1="82" x2="925" y1="303.9999999999999" y2="303.9999999999999" stroke="#e5e7eb"/>
+<text x="70" y="308.9999999999999" text-anchor="end" font-family="sans-serif" font-size="13">93.2%</text>
+<line x1="82" x2="925" y1="222.0000000000001" y2="222.0000000000001" stroke="#e5e7eb"/>
+<text x="70" y="227.0000000000001" text-anchor="end" font-family="sans-serif" font-size="13">95.8%</text>
+<line x1="82" x2="925" y1="139.99999999999983" y2="139.99999999999983" stroke="#e5e7eb"/>
+<text x="70" y="144.99999999999983" text-anchor="end" font-family="sans-serif" font-size="13">98.4%</text>
+<line x1="82" x2="925" y1="58.0" y2="58.0" stroke="#e5e7eb"/>
+<text x="70" y="63.0" text-anchor="end" font-family="sans-serif" font-size="13">101.0%</text>
+<text x="82.0" y="494" text-anchor="middle" font-family="sans-serif" font-size="13">0</text>
+<text x="250.6" y="494" text-anchor="middle" font-family="sans-serif" font-size="13">1000</text>
+<text x="419.2" y="494" text-anchor="middle" font-family="sans-serif" font-size="13">2000</text>
+<text x="587.8" y="494" text-anchor="middle" font-family="sans-serif" font-size="13">3000</text>
+<text x="756.4" y="494" text-anchor="middle" font-family="sans-serif" font-size="13">4000</text>
+<text x="925.0" y="494" text-anchor="middle" font-family="sans-serif" font-size="13">5000</text>
+<line x1="82" x2="82" y1="58" y2="468" stroke="#374151"/>
+<line x1="82" x2="925" y1="468" y2="468" stroke="#374151"/>
+<polyline fill="none" stroke="#d97706" stroke-width="3" points="82.0,89.5 98.9,197.5 115.7,197.7 132.6,197.7 149.4,210.9 166.3,218.4 183.2,219.1 200.0,228.5 216.9,228.5 233.7,233.7 250.6,246.6 267.5,252.2 284.3,258.7 301.2,261.1 318.0,261.1 334.9,263.1 351.8,268.5 368.6,269.5 385.5,273.8 402.3,276.1 419.2,276.1 436.1,277.5 452.9,281.3 469.8,283.7 486.6,292.6 503.5,293.0 520.4,293.0 537.2,299.4 554.1,303.9 570.9,305.1 587.8,305.1 604.7,309.5 621.5,309.5 638.4,309.8 655.2,310.8 672.1,312.0 689.0,312.4 705.8,312.4 722.7,312.4 739.5,312.4 756.4,312.5 773.3,312.5 790.1,313.1 807.0,313.1 823.8,313.1 840.7,316.6 857.6,316.6 874.4,316.6 891.3,318.4 908.1,318.8 925.0,319.2"/>
+<polyline fill="none" stroke="#2563eb" stroke-width="3" points="82.0,89.5 98.9,251.2 115.7,254.5 132.6,263.0 149.4,269.3 166.3,274.0 183.2,284.4 200.0,320.3 216.9,323.3 233.7,328.7 250.6,333.1 267.5,334.6 284.3,334.6 301.2,341.2 318.0,344.0 334.9,345.7 351.8,345.7 368.6,347.5 385.5,351.7 402.3,351.9 419.2,351.9 436.1,366.7 452.9,370.5 469.8,370.5 486.6,373.6 503.5,376.4 520.4,376.4 537.2,377.0 554.1,378.0 570.9,378.0 587.8,378.0 604.7,380.4 621.5,381.7 638.4,383.4 655.2,387.7 672.1,388.9 689.0,396.1 705.8,396.1 722.7,396.1 739.5,396.1 756.4,399.1 773.3,399.3 790.1,399.3 807.0,400.4 823.8,400.4 840.7,400.4 857.6,401.9 874.4,401.9 891.3,402.8 908.1,403.1 925.0,403.1"/>
+<text x="480" y="525" text-anchor="middle" font-family="sans-serif" font-size="14">Iteration</text>
+<text x="800" y="78" fill="#d97706" font-family="sans-serif" font-size="15">TSO</text>
+<text x="860" y="78" fill="#2563eb" font-family="sans-serif" font-size="15">TSR</text>
+</svg>
