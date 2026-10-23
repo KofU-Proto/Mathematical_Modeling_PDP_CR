@@ -5,6 +5,44 @@ using .PDPCRMember1, .PDPCRMember2, .PDPCRMember3
 include(joinpath(@__DIR__, "..", "experiments", "statistics.jl"))
 using .ExperimentStatistics
 
+@testset "Li & Lim VRPLIB → PDP-CR" begin
+    mktempdir() do dir
+        path = joinpath(dir, "LC1_2_test.vrp")
+        write(path, """NAME: LC1_2_test
+TYPE: PDPTW
+DIMENSION: 5
+NODE_COORD_SECTION
+1 7 8
+2 10 10
+3 1 1
+4 13 14
+5 4 5
+PICKUP_AND_DELIVERY_SECTION
+1 0 0 0 0 0 0
+2 1 0 0 0 0 4
+3 1 0 0 0 0 5
+4 -1 0 0 0 2 0
+5 -1 0 0 0 3 0
+DEPOT_SECTION
+1
+-1
+EOF
+""")
+        instance = load_li_lim_vrp(path, 10; seed=42)
+        @test instance.depot == (7.0, 8.0)
+        @test length(instance.tasks) == 2
+        @test instance.tasks[1].pickup == (10.0, 10.0)
+        @test instance.tasks[1].delivery == (13.0, 14.0)
+        @test instance.tasks[1].processing_time == 5.0
+        @test instance.tasks == load_li_lim_vrp(path, 10; seed=42).tasks
+        @test all(1 <= task.required_robots <= 5 for task in instance.tasks)
+        @test_throws ArgumentError load_li_lim_vrp(path, 4)
+        bad = joinpath(dir, "bad.vrp")
+        write(bad, replace(read(path, String), "4 -1 0 0 0 2 0" => "4 -1 0 0 0 3 0"))
+        @test_throws ArgumentError load_li_lim_vrp(bad, 10)
+    end
+end
+
 @testset "Tabu Search: tham số và bất biến" begin
     tso = default_tabu_config(150, :TSO)
     tsr = default_tabu_config(150, :TSR)

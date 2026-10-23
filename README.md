@@ -145,6 +145,24 @@ Các SVG tương ứng nằm trong `plots/member3/`.
 
 Kết quả chạy hiện tại và diễn giải nằm tại `report/member3_tabu_search.md`.
 `src/s_greedy.jl` cài Algorithm 5–6 và trả về `Solution` của phần 1; module
-phần 2 chuyển nghiệm đó sang `FlowSolution` cho Tabu Search. Thử nghiệm vẫn
-dùng instance ngẫu nhiên do phần 1 sinh ra, không dùng bộ Li & Lim của bài báo,
-nên số liệu không phải phép tái lập trực tiếp Bảng 5.
+phần 2 chuyển nghiệm đó sang `FlowSolution` cho Tabu Search. Lệnh mặc định
+dùng instance ngẫu nhiên do phần 1 sinh ra; lệnh bên dưới dùng bộ Li & Lim.
+
+### Instance Li & Lim chuyển đổi theo luận án
+
+Các file `.vrp` công khai trong `data/li_lim_raw/` là 5 nhóm `LC1_2..10`,
+mỗi nhóm 10 file, từ
+bộ Li & Lim. Bộ đọc `load_li_lim_vrp` ở `src/li_lim_adapter.jl` chuyển mỗi cặp
+pickup-delivery thành một `PDPTask`, giữ tọa độ depot, tính thời gian xử lý bằng
+khoảng cách Euclid và sinh nhu cầu robot đều từ `1..5`. Seed chuyển đổi được
+ghi vào `runs.csv`; `source` là tên file gốc, `actual_tasks` là số cặp thực tế.
+Các file trong nhóm `n=100` này thực tế có 103–107 cặp. `SHA256SUMS` ghi hash
+từng file để kiểm tra nguồn dữ liệu.
+
+```bash
+julia --project=. experiments/run_comparison.jl --input-dir=data/li_lim_raw --robots=10 --demand-seed=42 --iterations=5000 --initial-trials=50 --k-range=1,2 --output=results/member3/li_lim_lc1_all
+```
+
+Đây là tái lập theo mô tả luận án trên một tập `LC1` được công bố. Chưa biết
+chính xác 10 file mỗi kích thước và seed chuyển đổi mà tác giả đã dùng, nên
+không coi số liệu là phép tái tạo đúng Bảng 5.
