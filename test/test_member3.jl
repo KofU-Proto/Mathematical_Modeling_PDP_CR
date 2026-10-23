@@ -14,7 +14,7 @@ using .ExperimentStatistics
     @test_throws ArgumentError default_tabu_config(10, :bad)
 
     instance = generate_instance(15, 4; seed=8)
-    fresh = diversified_greedy_solution(instance; rng=MersenneTwister(8))
+    fresh = s_greedy_solution(instance; rng=MersenneTwister(8))
     @test validate_solution(instance, fresh)
     @test is_feasible(instance, fresh)
     initial = from_solution(FlowProblem(instance), instance, greedy_initial_solution(instance; seed=8))
@@ -33,6 +33,36 @@ using .ExperimentStatistics
         @test sum(values(result.selected_moves)) <= result.iterations
         version === :TSO && @test result.selected_moves[:redistribute] == 0
     end
+end
+
+@testset "S-greedy Algorithm 5–6 và best-of-trials" begin
+    instance = ProblemInstance([
+        PDPTask("A", (0, 0), (1, 0), 1, 1),
+        PDPTask("B", (10, 0), (11, 0), 1, 1),
+    ], 2)
+    sol = s_greedy_solution(instance; rng=MersenneTwister(1), k_range=(2, 2))
+    @test sol.order == [1, 2]
+    @test sol.teams == [[1], [2]]
+    @test is_feasible(instance, sol)
+    @test_throws ArgumentError s_greedy_solution(instance; k_range=(2, 1))
+    @test_throws ArgumentError best_s_greedy_solution(instance; trials=0)
+
+    for seed in 1:20
+        inst = generate_instance(12, 5; seed)
+        s = s_greedy_solution(inst; rng=MersenneTwister(seed), k_range=(1, 3))
+        @test is_feasible(inst, s)
+        f = from_solution(FlowProblem(inst), inst, s)
+        @test makespan(f) ≈ PDPCRMember1.makespan(inst, s)
+    end
+    inst = generate_instance(15, 5; seed=20)
+    rng = MersenneTwister(9)
+    values = [PDPCRMember1.makespan(inst, s_greedy_solution(inst; rng)) for _ in 1:10]
+    best = best_s_greedy_solution(inst; rng=MersenneTwister(9), trials=10)
+    @test PDPCRMember1.makespan(inst, best) ≈ minimum(values)
+    config = default_tabu_config(15, :TSO; max_iterations=0, initial_trials=10)
+    wrapped = tabu_search(inst; config, seed=9)
+    @test wrapped.initial_makespan ≈ PDPCRMember1.makespan(inst, best)
+    @test wrapped.best_makespan == wrapped.initial_makespan
 end
 
 @testset "Thống kê cặp và đường hội tụ" begin

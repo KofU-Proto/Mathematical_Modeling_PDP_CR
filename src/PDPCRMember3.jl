@@ -5,8 +5,10 @@ using Random
 using ..PDPCRMember1
 using ..PDPCRMember2
 
+include("s_greedy.jl")
 include("tabu_search.jl")
 
-export TabuConfig, TabuResult, default_tabu_config, tabu_search, diversified_greedy_solution
+export TabuConfig, TabuResult, default_tabu_config, tabu_search
+export s_greedy_solution, best_s_greedy_solution
 
 end

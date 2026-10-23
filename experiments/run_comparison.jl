@@ -7,6 +7,7 @@ using .PDPCRMember1, .PDPCRMember2, .PDPCRMember3, .ExperimentStatistics
 function options(args)
     opts = Dict("sizes" => "15,30", "robots" => "5,10", "seeds" => "1,2",
                 "iterations" => "5000", "step" => "100",
+                "initial-trials" => "50", "k-range" => "1,2",
                 "output" => joinpath(@__DIR__, "..", "results", "member3"))
     for arg in args
         startswith(arg, "--") && occursin('=', arg) ||
@@ -21,7 +22,14 @@ function options(args)
         throw(ArgumentError("sizes, robots phải dương; seeds không được rỗng"))
     iterations, step = parse(Int, opts["iterations"]), parse(Int, opts["step"])
     iterations >= 0 && step > 0 || throw(ArgumentError("iterations >= 0 và step > 0"))
-    return (; sizes, robots, seeds, iterations, step, output=opts["output"])
+    initial_trials = parse(Int, opts["initial-trials"])
+    range_values = parse_list("k-range")
+    length(range_values) == 2 || throw(ArgumentError("k-range cần hai số, ví dụ 1,2"))
+    k_range = (range_values[1], range_values[2])
+    initial_trials >= 1 && 1 <= k_range[1] <= k_range[2] ||
+        throw(ArgumentError("cần initial-trials >= 1 và 1 <= k1 <= k2"))
+    return (; sizes, robots, seeds, iterations, step, initial_trials, k_range,
+             output=opts["output"])
 end
 
 function run_comparison(opts)
@@ -29,15 +37,18 @@ function run_comparison(opts)
     warm_instance = generate_instance(8, 5; seed=0)
     warm_problem = FlowProblem(warm_instance)
     warm_initial = from_solution(warm_problem, warm_instance,
-                                 greedy_initial_solution(warm_instance; seed=0))
+        best_s_greedy_solution(warm_instance; rng=MersenneTwister(0), trials=2))
     for version in (:TSO, :TSR)
         tabu_search(warm_initial; config=default_tabu_config(8, version; max_iterations=2),
-                    rng=MersenneTwister(0))
+                    rng=MersenneTwister(0),
+                    restart_initial=rng -> from_solution(warm_problem, warm_instance,
+                        best_s_greedy_solution(warm_instance; rng, trials=2)))
     end
     pairs = NamedTuple[]
     runs = NamedTuple[]
     run_header = ["n", "m", "seed", "version", "initial_makespan", "best_makespan",
-                  "seconds", "iterations", "elite_restarts", "initial_restarts",
+                  "seconds", "iterations", "initial_trials", "k1", "k2",
+                  "elite_restarts", "initial_restarts",
                   "reroute_moves", "reverse_moves", "redistribute_moves"]
     summary_header = ["n", "m", "instances", "tso_best", "tso_mean", "tsr_best", "tsr_mean",
                       "tso_mean_seconds", "tsr_mean_seconds", "tsr_better", "tsr_better_percent",
@@ -49,13 +60,17 @@ function run_comparison(opts)
     for n in opts.sizes, m in opts.robots, seed in opts.seeds
         instance = generate_instance(n, m; seed)
         problem = FlowProblem(instance)
-        initial = from_solution(problem, instance, greedy_initial_solution(instance; seed))
+        initial = from_solution(problem, instance,
+            best_s_greedy_solution(instance; rng=MersenneTwister(seed),
+                k_range=opts.k_range, trials=opts.initial_trials))
         results = Dict{Symbol,TabuResult}()
         seconds = Dict{Symbol,Float64}()
         for version in (:TSO, :TSR)
-            config = default_tabu_config(n, version; max_iterations=opts.iterations)
+            config = default_tabu_config(n, version; max_iterations=opts.iterations,
+                initial_trials=opts.initial_trials, initial_k_range=opts.k_range)
             next_initial(rng) = from_solution(problem, instance,
-                diversified_greedy_solution(instance; rng))
+                best_s_greedy_solution(instance; rng, k_range=opts.k_range,
+                    trials=opts.initial_trials))
             elapsed = @elapsed result = tabu_search(initial; config,
                 rng=MersenneTwister(seed), restart_initial=next_initial)
             results[version] = result
@@ -63,7 +78,9 @@ function run_comparison(opts)
             push!(runs, (n=n, m=m, seed=seed, version=version,
                 initial_makespan=result.initial_makespan,
                 best_makespan=result.best_makespan, seconds=elapsed,
-                iterations=result.iterations, elite_restarts=result.elite_restarts,
+                iterations=result.iterations, initial_trials=opts.initial_trials,
+                k1=opts.k_range[1], k2=opts.k_range[2],
+                elite_restarts=result.elite_restarts,
                 initial_restarts=result.initial_restarts,
                 reroute_moves=result.selected_moves[:reroute],
                 reverse_moves=result.selected_moves[:reverse],
